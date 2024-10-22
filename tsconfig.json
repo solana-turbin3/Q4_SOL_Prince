@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "target": "ES2020",
+    "lib": ["ES2019"],
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "noImplicitAny": true
+  }
+}

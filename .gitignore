@@ -1,0 +1,8 @@
+*wallet.json
+node_modules
+*.lock
+target
+*wallet.json
+node_modules
+target
+.DS_Store
