@@ -20,18 +20,19 @@ umi.use(signerIdentity(signer));
     try {
         // Follow the JSON structure specified in the Metaplex documentation
         // Reference: https://docs.metaplex.com/programs/token-metadata/changelog/v1.0#json-structure
+        // https://arweave.net/DxEL8waNAdHo6pbrz5RF4oJbksQQYDQtjd8zNt1okE6h
 
-        const image = "https://devnet.irys.xyz/5jeemZX36acSXUtXTMAdVMiFgU86GRfzmsiEdvRMZdfh"; // Image URI
+        const image = "https://devnet.irys.xyz/DxEL8waNAdHo6pbrz5RF4oJbksQQYDQtjd8zNt1okE6h"; // Image URI
 
         // Define the metadata for the token
         const metadata = {
-            name: "Rugged by jeff's beard", // Name of the token
-            symbol: "legendary rugg", // Token symbol
-            description: "dont get lost in there...", // Description of the token
+            name: "Crypto Ape", // Name of the token
+            symbol: "Ape", // Token symbol
+            description: "Rich Ape", // Description of the token
             image: image, // Link to the image associated with the token
             attributes: [ // Attributes that describe the token
                 { trait_type: 'color', value: 'white' },
-                { trait_type: 'what she said ??', value: 'its long' },
+                { trait_type: 'Dress color', value: 'green' },
                 { trait_type: 'rarity', value: '100%' },
             ],
             properties: { // Additional properties for the token

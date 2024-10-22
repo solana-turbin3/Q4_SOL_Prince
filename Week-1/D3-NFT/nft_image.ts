@@ -20,7 +20,7 @@ umi.use(signerIdentity(signer));
 (async () => {
     try {
         // 1. Load the image file from the specified path
-        const img = await readFile("/Users/prince/Turbin-3/Q4_Sol_Prince/Week-1/D3-NFT/utils/generug.png");
+        const img = await readFile("/Users/prince/Turbin-3/Q4_Sol_Prince/Week-1/D3-NFT/utils/Crypto_Ape.jpg");
         // 2. Convert the loaded image into a generic file format
         const genImg = createGenericFile(img,"rug",{
             contentType: "image/png"

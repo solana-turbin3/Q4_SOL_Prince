@@ -28,9 +28,9 @@ const mint = generateSigner(umi);
     // Create the transaction to mint a new NFT
     let tx = createNft(umi, {
         mint, // The generated mint signer
-        name: "Jeff's beard rug", // The name of the NFT
-        symbol: "long", // The symbol for the NFT
-        uri: "https://devnet.irys.xyz/596ZjtA4eNdb6aAdwzpvDMrWTeWDH985F5tjYEkkZeBs", // URI for the NFT metadata
+        name: "Crypto Ape", // The name of the NFT
+        symbol: "Ape", // The symbol for the NFT
+        uri: "https://devnet.irys.xyz/Jc42nLb6pjSiwmdWRR3N1dMTvC9zkNQWbduL3N7sZZF", // URI for the NFT metadata
         sellerFeeBasisPoints: percentAmount(1), // Seller fee in basis points (1% in this case)
     });
 

@@ -17,8 +17,8 @@
     "spl_mint": "ts-node ./Week-1/D1-Token_Program/spl_mint.ts",
     "spl_metadata": "ts-node ./Week-1/D2-Token_with_MetaData/spl_metadata.ts",
     "spl_transfer": "ts-node ./Week-1/D2-Token_with_MetaData/spl_transfer.ts",
-    "nft_images": "ts-node ./Week-1/D3-NFT/nft_image.ts",
-    "nft_metadata.ts": "ts-node ./Week-1/D3-NFT/nft_metadata.t",
+    "nft_image": "ts-node ./Week-1/D3-NFT/nft_image.ts",
+    "nft_metadata": "ts-node ./Week-1/D3-NFT/nft_metadata.ts",
     "nft_mint": "ts-node ./Week-1/D3-NFT/nft_mint.ts"
   },
   "dependencies": {
