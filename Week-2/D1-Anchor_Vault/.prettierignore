@@ -1,9 +1,7 @@
-*wallet.json
-*.lock
 .anchor
 .DS_Store
 target
-**/*.rs.bk
 node_modules
+dist
+build
 test-ledger
-.yarn
