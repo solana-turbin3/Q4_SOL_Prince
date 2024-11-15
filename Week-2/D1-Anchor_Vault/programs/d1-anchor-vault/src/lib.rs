@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, system_program::{Transfer, transfer}};
 
-declare_id!("6Xg3oozjWa2Swooin2YcYZ3aA7KeMuFYX4tF5omCkJK1");
+declare_id!("49ehR7TJnd1v8nzWxeEEvf4xCRevYFrvUxhQuuA29A9A");
 
 #[program]
 pub mod anchor_vault {
