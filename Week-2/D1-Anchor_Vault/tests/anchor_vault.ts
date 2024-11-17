@@ -82,7 +82,7 @@ describe("anchor_vault", () => {
     try {
       const depositAmt = 10;
       const tx = await program.methods
-        .deposit(new BN(depositAmt * LAMPORTS_PER_SOL))
+        .deposit(new anchor.BN(depositAmt * LAMPORTS_PER_SOL))
         .accounts({
           user: user.publicKey,
           vault: vault,
@@ -109,7 +109,7 @@ describe("anchor_vault", () => {
           vault_state: vault_state,
           system_program: anchor.web3.SystemProgram.programId,
         })
-        .signers([user])
+        // .signers([user])
         .rpc()
         .then(confirmTx);
       console.log("withdraw sol : ", tx);
@@ -125,8 +125,8 @@ describe("anchor_vault", () => {
         .accounts({
           user: user.publicKey,
           vault: vault,
-          vault_state: vault_state,
-          system_program: anchor.web3.SystemProgram.programId,
+          vaultState: vault_state,
+          systemProgram: anchor.web3.SystemProgram.programId,
         })
         .signers([user])
         .rpc()

@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, system_program::{Transfer, transfer}};
 
-declare_id!("49ehR7TJnd1v8nzWxeEEvf4xCRevYFrvUxhQuuA29A9A");
+declare_id!("71r1B1tee9RJsT1Tv8K5HqUJVig2Ve7Ykd1sbLgPo94H");
 
 #[program]
 pub mod anchor_vault {
@@ -221,7 +221,7 @@ pub struct Close<'info> {
     #[account(
         mut, // `vault_state` is mutable.
         seeds = [b"state", user.key().as_ref()], // Derives vault_state's address from a seed prefix and user's public key.
-        bump = vault_state.vault_bump, // Matches the bump used in the PDA derivation.
+        bump = vault_state.state_bump, // Matches the bump used in the PDA derivation.
         close = user, // Closes `vault_state` account and returns remaining lamports to `user`.
     )]
     pub vault_state: Account<'info, VaultState>, // Custom account holding vault-related state.
@@ -236,7 +236,7 @@ impl<'info> Close<'info> {
         // Setup CPI (cross-program invocation) to perform a lamport transfer.
         let cpi_program = self.system_program.to_account_info(); // System program account.
         
-        // Define accounts involved in the transfer: `vault` as the source and `user` as the destination.
+        // Define accounts in   volved in the transfer: `vault` as the source and `user` as the destination.
         let cpi_accounts = Transfer {
             from: self.vault.to_account_info(), // Source: the vault account.
             to: self.user.to_account_info(), // Destination: the user account.
