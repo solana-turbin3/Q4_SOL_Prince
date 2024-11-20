@@ -11,48 +11,42 @@ import {
 import {
   MINT_SIZE,
   TOKEN_2022_PROGRAM_ID,
+  // TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountIdempotentInstruction,
   createInitializeMint2Instruction,
   createMintToInstruction,
   getAssociatedTokenAddressSync,
   getMinimumBalanceForRentExemptMint,
 } from "@solana/spl-token";
-import { randomBytes, sign } from "crypto";
+import { randomBytes } from "crypto";
 
-const confirmTx = async (signature: string) => {
-  const startTime = Date.now();
-  const timeoutMs = 60000; // 1 minute timeout
-
-  while (Date.now() - startTime < timeoutMs) {
-    const response = await anchor
-      .getProvider()
-      .connection.getSignatureStatuses([signature]);
-    const status = response.value[0];
-
-    if (status && status.confirmationStatus === "confirmed") {
-      return signature;
-    }
-
-    // Wait 100ms before next check
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-
-  throw new Error(
-    `Transaction confirmation timeout after ${
-      timeoutMs / 1000
-    } seconds: ${signature}`
-  );
-};
-
-describe("anchor-escrow", () => {
+describe("escrow", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
   const provider = anchor.getProvider();
+
   const connection = provider.connection;
 
   const program = anchor.workspace.Escrow as Program<Escrow>;
 
   const tokenProgram = TOKEN_2022_PROGRAM_ID;
+  // const tokenProgram = TOKEN_PROGRAM_ID;
+
+  const confirm = async (signature: string): Promise<string> => {
+    const block = await connection.getLatestBlockhash();
+    await connection.confirmTransaction({
+      signature,
+      ...block,
+    });
+    return signature;
+  };
+
+  const log = async (signature: string): Promise<string> => {
+    console.log(
+      `Your transaction signature: https://explorer.solana.com/transaction/${signature}?cluster=custom&customUrl=${connection.rpcEndpoint}`
+    );
+    return signature;
+  };
 
   const seed = new BN(randomBytes(8));
 
@@ -63,31 +57,17 @@ describe("anchor-escrow", () => {
   const [makerAtaA, makerAtaB, takerAtaA, takerAtaB] = [maker, taker]
     .map((a) =>
       [mintA, mintB].map((m) =>
-        getAssociatedTokenAddressSync(
-          m.publicKey,
-          a.publicKey,
-          false,
-          tokenProgram
-        )
+        getAssociatedTokenAddressSync(m.publicKey, a.publicKey, false, tokenProgram)
       )
     )
     .flat();
 
   const escrow = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("escrow"),
-      maker.publicKey.toBuffer(),
-      seed.toArrayLike(Buffer, "le", 8),
-    ],
+    [Buffer.from("escrow"), maker.publicKey.toBuffer(), seed.toArrayLike(Buffer, "le", 8)],
     program.programId
   )[0];
 
-  const vault = getAssociatedTokenAddressSync(
-    mintA.publicKey,
-    escrow,
-    true,
-    tokenProgram
-  );
+  const vault = getAssociatedTokenAddressSync(mintA.publicKey, escrow, true, tokenProgram);
 
   // Accounts
   const accounts = {
@@ -102,7 +82,7 @@ describe("anchor-escrow", () => {
     escrow,
     vault,
     tokenProgram,
-  };
+  }
 
   it("Airdrop and create mints", async () => {
     let lamports = await getMinimumBalanceForRentExemptMint(connection);
@@ -127,39 +107,15 @@ describe("anchor-escrow", () => {
       ...[
         { mint: mintA.publicKey, authority: maker.publicKey, ata: makerAtaA },
         { mint: mintB.publicKey, authority: taker.publicKey, ata: takerAtaB },
-      ].flatMap((x) => [
-        createInitializeMint2Instruction(
-          x.mint,
-          6,
-          x.authority,
-          null,
-          tokenProgram
-        ),
-        createAssociatedTokenAccountIdempotentInstruction(
-          provider.publicKey,
-          x.ata,
-          x.authority,
-          x.mint,
-          tokenProgram
-        ),
-        createMintToInstruction(
-          x.mint,
-          x.ata,
-          x.authority,
-          1e9,
-          undefined,
-          tokenProgram
-        ),
-      ]),
+      ]
+      .flatMap((x) => [
+        createInitializeMint2Instruction(x.mint, 6, x.authority, null, tokenProgram),
+        createAssociatedTokenAccountIdempotentInstruction(provider.publicKey, x.ata, x.authority, x.mint, tokenProgram),
+        createMintToInstruction(x.mint, x.ata, x.authority, 1e9, undefined, tokenProgram),
+      ])
     ];
 
-    await provider
-      .sendAndConfirm(tx, [mintA, mintB, maker, taker])
-      .then(async (signature) => {
-        console.log(
-          `Your transaction signature: https://explorer.solana.com/transaction/${signature}?cluster=custom&customUrl=${connection.rpcEndpoint}`
-        );
-      });
+    await provider.sendAndConfirm(tx, [mintA, mintB, maker, taker]).then(log);
   });
 
   it("Make", async () => {
@@ -168,42 +124,32 @@ describe("anchor-escrow", () => {
       .accounts({ ...accounts })
       .signers([maker])
       .rpc()
-      .then(confirmTx)
-      .then(async (signature) => {
-        console.log(
-          `Your transaction signature: https://explorer.solana.com/transaction/${signature}?cluster=custom&customUrl=${connection.rpcEndpoint}`
-        );
-      });
+      .then(confirm)
+      .then(log);
   });
 
-  // xit("Refund", async () => {
-  //   await program.methods
-  //     .refund()
-  //     .accounts({ ...accounts })
-  //     .signers([maker])
-  //     .rpc()
-  //     .then(confirmTx)
-  //     .then(async(signature) => {
-  //    console.log(`Your transaction signature: https://explorer.solana.com/transaction/${signature}?cluster=custom&customUrl=${connection.rpcEndpoint}`)
-  //  });
-  // });
+  xit("Refund", async () => {
+    await program.methods
+      .refund()
+      .accounts({ ...accounts })
+      .signers([maker])
+      .rpc()
+      .then(confirm)
+      .then(log);
+  });
 
   it("Take", async () => {
     try {
-      await program.methods
-        .take()
-        .accounts({ ...accounts })
-        .signers([taker])
-        .rpc()
-        .then(confirmTx)
-        .then(async (signature) => {
-          console.log(
-            `Your transaction signature: https://explorer.solana.com/transaction/${signature}?cluster=custom&customUrl=${connection.rpcEndpoint}`
-          );
-        });
-    } catch (e) {
+    await program.methods
+      .take()
+      .accounts({  ...accounts })
+      .signers([taker])
+      .rpc()
+      .then(confirm)
+      .then(log);
+    } catch(e) {
       console.log(e);
-      throw e;
+      throw(e)
     }
   });
 });
