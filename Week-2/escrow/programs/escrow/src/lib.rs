@@ -1,15 +1,12 @@
-pub mod constants;
-pub mod error;
-pub mod instructions;
-pub mod state;
-
 use anchor_lang::prelude::*;
 
-pub use constants::*;
-pub use instructions::*;
+pub mod contexts;
+use contexts::*;
+
+pub mod state;
 pub use state::*;
 
-declare_id!("BmhSQQDQMnXKKsQSW1fz1UajAU8BZxMS1v92uzYCyZVr");
+declare_id!("2pDEXE7h7w7FK7cKqpgSHyzJZoQpGGAo32KnqHbbvMZE");
 
 #[program]
 pub mod escrow {
@@ -21,11 +18,11 @@ pub mod escrow {
     }
 
     pub fn refund(ctx: Context<Refund>) -> Result<()> {
-        ctx.accounts.refund_and_close_vault()
+        ctx.accounts.refund_and_close()
     }
 
     pub fn take(ctx: Context<Take>) -> Result<()> {
-            ctx.accounts.deposit()?;
-            ctx.accounts.withdraw_and_close_vault()
+        ctx.accounts.deposit()?;
+        ctx.accounts.withdraw_and_close_vault()
     }
 }

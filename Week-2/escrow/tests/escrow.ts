@@ -44,7 +44,7 @@ const confirmTx = async (signature: string) => {
   );
 };
 
-describe("escrow", () => {
+describe("anchor-escrow", () => {
   anchor.setProvider(anchor.AnchorProvider.env());
 
   const provider = anchor.getProvider();
@@ -103,7 +103,6 @@ describe("escrow", () => {
     vault,
     tokenProgram,
   };
-  console.log("Accounts :" , accounts);
 
   it("Airdrop and create mints", async () => {
     let lamports = await getMinimumBalanceForRentExemptMint(connection);
@@ -164,19 +163,9 @@ describe("escrow", () => {
   });
 
   it("Make", async () => {
-    const balance = await connection.getBalance(maker.publicKey);
-    console.log("Maker balance:", balance/LAMPORTS_PER_SOL); 
     await program.methods
       .make(seed, new BN(1e6), new BN(1e6))
-      .accountsPartial({
-        maker:maker.publicKey,
-        mintA:mintA.publicKey,
-        mintB:mintB.publicKey,
-        makerAtaA,
-        escrow,
-        vault,
-        tokenProgram,
-      })
+      .accounts({ ...accounts })
       .signers([maker])
       .rpc()
       .then(confirmTx)
