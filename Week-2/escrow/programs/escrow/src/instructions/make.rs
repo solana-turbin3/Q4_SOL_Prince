@@ -10,7 +10,7 @@ use crate::state::Escrow;
 pub struct Make<'info> {
     /// The account of the user initiating the escrow.
     #[account(mut)]
-    pub maker: Signer<'info>,
+    pub maker: Signer<'info>,   
 
     /// The mint for the token that the maker will deposit into the escrow.
     /// Ensures the mint is associated with the specified token program.
